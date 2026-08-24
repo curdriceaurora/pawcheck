@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html class="paw-theme-root">
+<head>
+  <meta charset="utf-8" />
+  <title>PawCheck</title>
+  <link rel="stylesheet" href="../content/tokens.css" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <span class="title">🐾 PawCheck</span>
+      <button id="rescan" title="Rescan page">↻ Rescan</button>
+    </div>
+    <div id="content" class="content">
+      <p class="status-tone tone-loading">Loading…</p>
+    </div>
+    <div class="settings">
+      <label class="toggle-label" title="Warning: High network usage">
+        <input type="checkbox" id="toggle-search-badging" />
+        <span>Enable search listings badges</span>
+      </label>
+    </div>
+  </div>
+  <script src="../shared/formatters.js"></script>
+  <script src="../shared/site-registry.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

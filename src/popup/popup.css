@@ -1,0 +1,140 @@
+body {
+  margin: 0;
+  width: 300px;
+  font-family: var(--paw-font-family);
+  font-size: 13px;
+  color: var(--paw-color-text);
+  background: var(--paw-color-surface);
+}
+
+.wrap {
+  padding: 12px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+#rescan {
+  border: 1px solid var(--paw-color-control-border);
+  background: var(--paw-color-surface-subtle);
+  color: var(--paw-color-text);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#rescan:hover {
+  background: var(--paw-color-surface-hover);
+}
+
+#rescan:focus-visible {
+  outline: 2px solid var(--paw-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.muted {
+  color: var(--paw-color-text-muted);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--paw-color-border-subtle);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: var(--paw-color-text-secondary);
+  font-weight: 500;
+}
+
+.value {
+  font-weight: 600;
+  text-align: right;
+}
+
+.tone-good { color: var(--paw-policy-allowed-text); }
+.tone-bad { color: var(--paw-policy-prohibited-text); }
+.tone-warn { color: var(--paw-policy-warning-text); }
+.tone-unknown { color: var(--paw-policy-unknown-text); }
+.tone-loading { color: var(--paw-policy-loading-text); }
+.tone-capped { color: var(--paw-policy-capped-text); }
+
+.status-tone {
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.status-tone.tone-loading { background: var(--paw-policy-loading-surface); }
+.status-tone.tone-capped { background: var(--paw-policy-capped-surface); }
+
+.snippet {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--paw-color-surface-subtle);
+  border-radius: 6px;
+  color: var(--paw-color-text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (forced-colors: active) {
+  #rescan {
+    border: 1px solid ButtonText;
+  }
+
+  #rescan:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .row {
+    border-bottom: 1px solid CanvasText;
+  }
+
+  .status-tone,
+  .snippet {
+    border: 1px solid CanvasText;
+  }
+}
+
+
+
+.settings {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--paw-color-border-subtle);
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--paw-color-text-secondary);
+}
+
+.toggle-label input {
+  margin: 0;
+  cursor: pointer;
+}
+
+@media (forced-colors: active) {
+  .settings {
+    border-top: 1px solid CanvasText;
+  }
+}

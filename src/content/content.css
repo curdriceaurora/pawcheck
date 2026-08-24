@@ -1,0 +1,640 @@
+#paw-panel {
+  position: fixed;
+  top: 96px;
+  right: 16px;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  background: var(--paw-color-surface);
+  border-radius: 12px;
+  box-shadow: var(--paw-shadow-panel);
+  z-index: 2147483000;
+  font-family: var(--paw-font-family);
+  font-size: 13px;
+  color: var(--paw-color-text);
+  overflow: hidden;
+  border: 1px solid var(--paw-color-border);
+  box-sizing: border-box;
+}
+
+#paw-panel.paw-beside {
+  width: 340px;
+}
+
+#paw-panel.paw-beside .paw-row {
+  grid-template-columns: 104px 16px 1fr 8px 84px;
+}
+
+#paw-panel .paw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: var(--paw-color-surface-subtle);
+  border-bottom: 1px solid var(--paw-color-border-subtle);
+}
+
+#paw-panel .paw-header.paw-tone-good { background: var(--paw-policy-allowed-surface); }
+#paw-panel .paw-header.paw-tone-bad { background: var(--paw-policy-prohibited-surface); }
+#paw-panel .paw-header.paw-tone-unknown { background: var(--paw-policy-unknown-surface); }
+#paw-panel .paw-header.paw-tone-loading { background: var(--paw-policy-loading-surface); }
+#paw-panel .paw-header.paw-tone-capped { background: var(--paw-policy-capped-surface); }
+
+#paw-panel .paw-title {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+#paw-panel .paw-header-btns {
+  display: flex;
+  gap: 4px;
+}
+
+#paw-panel .paw-header-btns button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: var(--paw-color-text-secondary);
+}
+
+#paw-panel .paw-header-btns button:hover {
+  background: var(--paw-color-surface-hover);
+}
+
+#paw-panel :where(button, [tabindex]):focus-visible {
+  outline: 2px solid var(--paw-color-focus-ring);
+  outline-offset: 2px;
+}
+
+#paw-panel .paw-body {
+  padding: 4px 16px 14px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+#paw-panel.paw-collapsed .paw-body {
+  display: none;
+}
+
+/* Row geometry — sized for the typical (Medium-density) case, not the
+   worst case: "Pre-registration" is the longest label any row uses, and
+   "$75 per stay" / "Required" are typical values. A dense listing with
+   long or multi-clause values grows taller rows against this same column
+   budget rather than widening the panel.
+   label(116) -> gutter(30, empty) -> value(1fr, dominant) -> gap(8, empty)
+   -> source(96). The label is right-aligned so its edge sits flush on the
+   gutter regardless of word length, instead of the gutter appearing to
+   drift depending on how short the label happens to be. Source is sized
+   to fit the longest of shortSourceLabel's short forms ("House Rules")
+   without ellipsis; it was still 64px — a track from when the panel
+   itself was 280px wide — until the panel grew to 400px in #37 without
+   the source column claiming any of that extra width. */
+#paw-panel .paw-row {
+  display: grid;
+  grid-template-columns: 116px 30px 1fr 8px 96px;
+  align-items: baseline;
+  padding: 10px 0;
+}
+
+/* A hairline between consecutive rows, not a border-bottom-then-strip-it-
+   from-the-last-one: rows sit among sibling divs (group headers, the
+   notes toggle, the footer), so "the last .paw-row" is never actually
+   the last child of its type and a :last-of-type/:last-child rule would
+   silently never fire. The adjacent-sibling form only ever draws a line
+   between two rows that are actually next to each other — none before
+   the first row in a group, none after the last row overall. */
+#paw-panel .paw-row + .paw-row {
+  border-top: 1px solid var(--paw-color-border-subtle);
+}
+
+#paw-panel .paw-group-hd {
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--paw-color-text-muted);
+  padding: 12px 0 4px;
+}
+
+#paw-panel .paw-group-hd:first-child {
+  padding-top: 4px;
+}
+
+/* Conflicting/alternate values sit inside the value cell (see .paw-value)
+   as a muted sub-line, not as a separate full-width callout below the
+   row — that way the conflict stays visually attached to its field. */
+#paw-panel .paw-alt {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--paw-policy-warning-text);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* A compound value stacks as separate lines in the same cell instead of
+   one comma-joined sentence — currently only the tiered-fee fallback
+   text uses this (see content.js). Row height grows; the column never
+   grows wider. */
+#paw-panel .paw-value-line {
+  display: block;
+}
+
+#paw-panel .paw-value-line + .paw-value-line {
+  margin-top: 2px;
+}
+
+/* Shared provenance-line styling: the standalone footer and the
+   sparse-state summary's source line show the same string with the same
+   weight, just in different positions — one full-width with a hairline
+   divider above it, one folded straight into its parent block with none. */
+#paw-panel .paw-source-badge,
+#paw-panel .paw-unconfirmed-src {
+  display: block;
+  font-size: 10px;
+  color: var(--paw-color-text-muted);
+  opacity: 0.85;
+}
+
+#paw-panel .paw-source-badge {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--paw-color-border-subtle);
+  text-align: left;
+}
+
+/* Sparse state: when every core field (max dogs, weight limit, fee,
+   pre-registration) is unconfirmed, the four-row table is replaced by a
+   single muted line naming what was checked. This keeps "nothing found"
+   from carrying the same structural weight as confirmed data — it
+   contracts from the normal row layout rather than reusing it with
+   "Not specified" filled in four times. */
+#paw-panel .paw-unconfirmed {
+  padding: 10px 0 6px;
+}
+
+#paw-panel .paw-unconfirmed-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--paw-color-text-muted);
+}
+
+#paw-panel .paw-unconfirmed-src {
+  margin-top: 8px;
+}
+
+#paw-panel .paw-other-toggle {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--paw-color-text-secondary);
+  padding: 8px 0 4px;
+  border-top: 1px dashed var(--paw-color-border);
+  margin-top: 4px;
+}
+
+#paw-panel .paw-other-list {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#paw-panel .paw-other-list.paw-visible {
+  display: flex;
+}
+
+/* Pullquote treatment: the quote is its own line (wraps freely, however
+   long it runs) and the source is a separate line below, right-justified
+   — so a long quote never drags the attribution into an awkward mid-line
+   wrap the way one trailing-inline sentence used to. */
+#paw-panel .paw-other-item {
+  font-size: 11.5px;
+  color: var(--paw-color-text-secondary);
+  background: var(--paw-color-surface-subtle);
+  border-left: 2px solid var(--paw-color-border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  line-height: 1.4;
+}
+
+#paw-panel .paw-other-quote {
+  display: block;
+  font-style: italic;
+}
+
+/* Multiple quotes attributed to the same source share one card. The
+   quote marks each line already carries are enough of a boundary — a
+   divider on top would be redundant, so this is spacing only. */
+#paw-panel .paw-other-quote + .paw-other-quote {
+  margin-top: 8px;
+}
+
+#paw-panel .paw-other-source {
+  display: block;
+  text-align: right;
+  margin-top: 6px;
+  color: var(--paw-color-text-muted);
+  font-style: italic;
+  font-size: 10.5px;
+}
+
+#paw-panel .paw-label {
+  grid-column: 1;
+  color: var(--paw-color-text-secondary);
+  font-weight: 500;
+  text-align: right;
+  align-self: start;
+  padding-top: 1px;
+}
+
+#paw-panel .paw-value {
+  grid-column: 3;
+  font-weight: 600;
+}
+
+.paw-tone-good { color: var(--paw-policy-allowed-text); }
+.paw-tone-bad { color: var(--paw-policy-prohibited-text); }
+.paw-tone-warn { color: var(--paw-policy-warning-text); }
+.paw-tone-unknown { color: var(--paw-policy-unknown-text); }
+.paw-tone-loading { color: var(--paw-policy-loading-text); }
+.paw-tone-capped { color: var(--paw-policy-capped-text); }
+
+/* Labeled jump link: shows the lowest-level, linkable source name (see
+   shortSourceLabel in content.js) plus a trailing arrow as the
+   clickability cue, in the panel's existing link color — compact and
+   informative rather than the bare word "source". Rows with no snippet
+   to jump to render no button at all, so the column is simply blank.
+   Truncation is done here by real rendered width (max-width tied to the
+   96px source track + ellipsis), not by guessing a character count in
+   JS — the full label is still available via the button's title. */
+#paw-panel .paw-jump {
+  grid-column: 5;
+  justify-self: end;
+  max-width: 100%;
+  border: none;
+  background: none;
+  color: var(--paw-color-link);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  padding: 0;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#paw-panel .paw-jump:hover,
+#paw-panel .paw-jump:focus-visible {
+  text-decoration: underline;
+}
+
+#paw-panel .paw-jump-arrow {
+  font-weight: 400;
+}
+
+#paw-panel .paw-empty {
+  color: var(--paw-color-text-muted);
+  line-height: 1.4;
+  padding: 4px 0;
+}
+
+.paw-highlight {
+  outline: 3px solid var(--paw-color-highlight-ring) !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+  transition: outline-color 0.3s ease;
+}
+
+/* Elevate container hosting badge above full-card anchor overlays.
+   Selects on .paw-badge-slot, not .paw-search-badge: the slot is the badge's
+   direct parent, so :has(> .paw-search-badge) would match the slot itself and
+   elevate one level too low. content.js sets the same three properties inline
+   on this element — the two must stay on the same node. */
+[data-paw-prop-id] :has(> .paw-badge-slot) {
+  position: relative !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
+}
+
+/* Block-level slot the badge fills. Owning this element is what decouples badge
+   width from the host container's display type.
+
+   How far that goes depends on the host, and the extra two properties are inert
+   outside the layout they name:
+     block / wrapping flex row -> width: 100% claims the full column.
+     grid                      -> width alone fills ONE cell, so grid-column
+                                  spans every track instead.
+     nowrap flex row           -> the slot shares the line with the host's own
+                                  content and shrinks. It cannot be won from the
+                                  child: forcing full width would push the
+                                  host's content out. The contract there is only
+                                  that the badge never overflows. */
+.paw-badge-slot {
+  display: block;
+  width: 100%;
+  flex-basis: 100%;
+  grid-column: 1 / -1;
+}
+
+/* Search Results Inline Badge */
+.paw-search-badge {
+  display: flex;
+  width: 100%;
+  /* Required, not cosmetic: without it the 8px horizontal padding and 1px
+     border overflow the slot by 18px. Vrbo guarantees no global border-box. */
+  box-sizing: border-box;
+  align-items: center;
+  /* justify-content centers the label as a flex item; text-align centers the
+     ragged final line when a long label wraps, which it does at 11.5px in a
+     380px card. Both are needed. */
+  justify-content: center;
+  text-align: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding: 4px 8px;
+  margin: 6px 0;
+  border-radius: 6px;
+  font-family: var(--paw-font-family);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  border: 1px solid var(--paw-color-border-subtle);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  user-select: none;
+  z-index: 100 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+.paw-search-badge:hover,
+.paw-search-badge:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: var(--paw-shadow-panel);
+  outline: 2px solid var(--paw-color-focus-ring);
+  outline-offset: 1px;
+}
+
+.paw-search-badge.paw-badge-allowed {
+  background: var(--paw-policy-allowed-surface);
+  color: var(--paw-policy-allowed-text);
+  border-color: var(--paw-policy-allowed-surface);
+}
+
+.paw-search-badge.paw-badge-banned {
+  background: var(--paw-policy-prohibited-surface);
+  color: var(--paw-policy-prohibited-text);
+  border-color: var(--paw-policy-prohibited-surface);
+}
+
+.paw-search-badge.paw-badge-loading {
+  background: var(--paw-policy-loading-surface);
+  color: var(--paw-policy-loading-text);
+  border-color: var(--paw-color-border-subtle);
+  font-weight: 500;
+}
+
+.paw-search-badge.paw-badge-unknown {
+  background: var(--paw-policy-unknown-surface);
+  color: var(--paw-policy-unknown-text);
+  border-color: var(--paw-color-border-subtle);
+}
+
+.paw-search-badge.paw-badge-capped {
+  background: var(--paw-policy-capped-surface);
+  color: var(--paw-policy-capped-text);
+  border-color: var(--paw-policy-capped-surface);
+}
+
+.paw-search-badge.paw-badge-restrictions,
+.paw-search-badge.paw-badge-warn {
+  background: var(--paw-policy-warning-surface);
+  color: var(--paw-policy-warning-text);
+  border-color: var(--paw-policy-warning-surface);
+}
+
+/* Floating Hover & Focus Policy Tooltip */
+.paw-search-tooltip {
+  position: fixed;
+  width: 290px;
+  max-width: calc(100vw - 32px);
+  background: var(--paw-color-surface);
+  border-radius: 12px;
+  box-shadow: var(--paw-shadow-panel);
+  border: 1px solid var(--paw-color-border);
+  padding: 12px;
+  z-index: 2147483640;
+  font-family: var(--paw-font-family);
+  font-size: 12px;
+  color: var(--paw-color-text);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.paw-search-tooltip.paw-tooltip-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.paw-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--paw-color-border-subtle);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--paw-color-text);
+}
+
+.paw-tooltip-close {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--paw-color-text-secondary);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.paw-tooltip-close:hover {
+  background: var(--paw-color-surface-hover);
+}
+
+.paw-tooltip-close:focus-visible {
+  outline: 2px solid var(--paw-color-focus-ring);
+  outline-offset: 2px;
+}
+
+.paw-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.paw-tooltip-row + .paw-tooltip-row {
+  border-top: 1px solid var(--paw-color-border-subtle);
+}
+
+.paw-tooltip-label {
+  color: var(--paw-color-text-secondary);
+  font-weight: 500;
+  font-size: 11.5px;
+}
+
+.paw-tooltip-val {
+  font-weight: 600;
+  font-size: 11.5px;
+  text-align: right;
+  color: var(--paw-color-text);
+  line-height: 1.35;
+}
+
+.paw-tooltip-val-line {
+  display: block;
+}
+
+.paw-tooltip-val-line + .paw-tooltip-val-line {
+  margin-top: 2px;
+}
+
+.paw-tooltip-notes {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: var(--paw-color-surface-subtle);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--paw-color-text-secondary);
+  line-height: 1.4;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.paw-tooltip-notes.paw-tone-warn {
+  background: var(--paw-policy-warning-surface);
+  color: var(--paw-policy-warning-text);
+  border-left: 2px solid var(--paw-policy-warning-text);
+}
+
+.paw-tooltip-footer {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--paw-color-border-subtle);
+  font-size: 10.5px;
+  color: var(--paw-color-text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.paw-tooltip-footer a {
+  color: var(--paw-color-link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.paw-tooltip-footer a:hover {
+  text-decoration: underline;
+}
+
+.paw-tooltip-footer a:focus-visible {
+  outline: 2px solid var(--paw-color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  #paw-panel {
+    border: 2px solid CanvasText;
+  }
+
+  #paw-panel .paw-header {
+    border-bottom: 1px solid CanvasText;
+  }
+
+  #paw-panel .paw-header-btns button {
+    border: 1px solid ButtonText;
+  }
+
+  #paw-panel .paw-row + .paw-row {
+    border-top: 1px solid CanvasText;
+  }
+
+  #paw-panel .paw-other-item {
+    border: 1px solid CanvasText;
+  }
+
+  #paw-panel .paw-jump {
+    color: LinkText;
+    text-decoration: underline;
+  }
+
+  #paw-panel :where(button, [tabindex]):focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .paw-highlight {
+    outline: 3px solid Highlight !important;
+  }
+
+  .paw-search-badge {
+    border: 1px solid ButtonText;
+  }
+
+  .paw-search-badge:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .paw-search-tooltip {
+    border: 2px solid CanvasText;
+  }
+
+  .paw-tooltip-header {
+    border-bottom: 1px solid CanvasText;
+  }
+
+  .paw-tooltip-close {
+    border: 1px solid ButtonText;
+  }
+
+  .paw-tooltip-close:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .paw-tooltip-row + .paw-tooltip-row {
+    border-top: 1px solid CanvasText;
+  }
+
+  .paw-tooltip-notes {
+    border: 1px solid CanvasText;
+  }
+
+  .paw-tooltip-footer {
+    border-top: 1px solid CanvasText;
+  }
+
+  .paw-tooltip-footer a {
+    color: LinkText;
+    text-decoration: underline;
+  }
+
+  .paw-tooltip-footer a:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+

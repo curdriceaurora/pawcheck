@@ -1,0 +1,9 @@
+{
+  "name": "pawcheck",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build-zip.js",
+    "package": "node tools/build-zip.js"
+  }
+}
