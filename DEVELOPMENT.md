@@ -20,6 +20,7 @@ to run `npm install` to build the extension.
 - `src/popup/` — toolbar popup
 - `src/shared/` — shared extraction, formatting, caching, and request logic
 - `src/sites/` — site-specific adapters
+- `docs/` — user-facing images referenced by the README
 - `store-assets/` — Chrome Web Store artwork and screenshots
 - `tools/build-zip.js` — release archive builder
 

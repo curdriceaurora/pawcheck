@@ -3,15 +3,35 @@
 PawCheck is a Chrome extension that finds dog-policy details on Vrbo, Airbnb,
 and Expedia listings and presents them in a compact summary.
 
-## Features
+![PawCheck showing a dog-policy summary beside a property listing](docs/listing-context.png)
 
-- Shows whether dogs are allowed.
-- Extracts dog-count and weight limits, fees, deposits, and approval rules.
-- Links each value back to its source text when possible.
-- Warns when listing sections contain contradictory rules.
-- Adds optional policy badges to Vrbo search results.
-- Stores settings and a short-lived policy cache locally in Chrome.
-- Follows the operating system's light or dark theme.
+## Why?
+
+Booking sites do not present pet policies in a consistent place. Hosts may
+put restrictions in house rules, amenities, property descriptions, policy
+sections, or structured page data. Rules can also conflict within the same
+listing.
+
+A property marked as pet-friendly may still limit dog count, weight, breed,
+or require fees and prior approval. PawCheck gathers those details so you do
+not have to search every section manually.
+
+## What
+
+When you open a supported listing, PawCheck reads the available pet-policy
+data and displays an on-page summary containing:
+
+- Whether dogs are allowed
+- Maximum dog count and weight limits
+- Pet fees and refundable deposits
+- Registration or prior-approval requirements
+- Other guidelines, including leash or breed restrictions
+
+![PawCheck dog-policy summary](docs/listing-summary.png)
+
+Source links jump to the corresponding listing text when possible. PawCheck
+also warns when sections contain contradictory rules, supports light and dark
+themes, and can add optional dog-policy badges to Vrbo search results.
 
 ## Install a release
 
