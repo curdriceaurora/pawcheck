@@ -33,6 +33,20 @@ Source links jump to the corresponding listing text when possible. PawCheck
 also warns when sections contain contradictory rules, supports light and dark
 themes, and can add optional dog-policy badges to Vrbo search results.
 
+## Listing examples
+
+### Vrbo
+
+![PawCheck on a Vrbo listing](docs/listing-gifs/vrbo-9793597ha.gif)
+
+### Airbnb
+
+![PawCheck on an Airbnb listing](docs/listing-gifs/airbnb-1022499796703563395.gif)
+
+### Expedia
+
+![PawCheck on an Expedia listing](docs/listing-gifs/expedia-candlewood-panama-city-beach.gif)
+
 ## Install a release
 
 1. Download `pawcheck-v1.0.0.zip` from
@@ -41,6 +55,9 @@ themes, and can add optional dog-policy badges to Vrbo search results.
 3. Open `chrome://extensions` in Chrome.
 4. Enable **Developer mode**.
 5. Select **Load unpacked** and choose the unzipped folder.
+
+When loading a source checkout instead, choose its `src/` directory. The
+repository root does not contain the extension manifest.
 
 ## Supported pages
 
