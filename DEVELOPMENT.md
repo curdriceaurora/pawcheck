@@ -38,7 +38,8 @@ The main runtime responsibilities are:
 - `content/lifecycle.js` — tracks SPA navigation, DOM mutations, extension
   invalidation, and access to `chrome.storage.local`
 - `shared/site-registry.js` — classifies URLs, extracts property IDs, and
-  exposes each site's structured-data and DOM-section configuration
+  exposes each site's structured-data hook and optional DOM-section
+  configuration
 - `content/pdp-panel.js` — scans listing pages, combines sources, renders the
   policy panel, and implements source jumps
 - `shared/extract.js` — builds the prioritized policy corpus, extracts policy
@@ -58,7 +59,7 @@ supplies listing data differently.
 | --- | --- | --- |
 | Vrbo | `window.__APOLLO_STATE__` | `content/page-bridge.js` runs in the page's MAIN world. It reads the current `PropertyInfo` graph and sends text to the isolated content script through `paw-apollo-data` events. |
 | Airbnb | `#data-deferred-state-0` | `sites/airbnb/adapter.js` parses the Relay/GraphQL `niobeClientData` JSON from the DOM. It keeps long numeric listing IDs as strings. |
-| Expedia | Microdata and JSON-LD | `sites/expedia/adapter.js` reads `meta[itemprop="petsAllowed"]` and matching `FAQPage` answers. |
+| Expedia | Microdata and JSON-LD | `sites/expedia/adapter.js` reads `meta[itemprop="petsAllowed"]` and matching `FAQPage` answers. It currently uses this path for both Expedia-native and Vrbo-hosted properties shown by Expedia. |
 
 Each site also uses a visible-DOM fallback. This fallback labels each text item
 with the nearest identified section. Source buttons use this label to open the
@@ -103,6 +104,27 @@ the toolbar popup use the same policy format. Before asynchronous expansion,
 the scan records the page URL. If SPA navigation changes the URL during the
 scan, PawCheck discards the result. It does not show the result on the next
 property.
+
+### Future support
+
+The current adapters use the same downstream policy logic. They do not collect
+source data at the same depth. Future work should classify both the website and
+the inventory source.
+
+| Listing surface | Current collection | Future improvement |
+| --- | --- | --- |
+| Native Vrbo property | PawCheck reads the full Vrbo `PropertyInfo` graph and uses Vrbo-specific DOM configuration. | Maintain the current native path as the reference implementation. |
+| Airbnb property | PawCheck walks the Niobe/Relay JSON and uses the generic DOM fallback. | Add Airbnb-specific content-column selectors, section matchers, and heading mappings. Keep the Niobe payload as the primary source. |
+| Expedia-native hotel or condo | PawCheck reads Expedia pet-policy microdata, matching FAQ JSON-LD, and visible DOM text. | Add verified Expedia policy fields and Expedia-specific DOM-section configuration. |
+| Expedia page for a Vrbo-hosted whole home | PawCheck uses the current Expedia adapter. It does not detect the underlying Vrbo inventory source. | Detect the inventory source. Inspect the Expedia wrapper for compatible Vrbo-derived data. Do not assume that the native Vrbo Apollo graph is available. |
+
+Future collectors must return the existing `{header, section, text}` item
+format. `buildCorpus()` and `extractPolicy()` must remain the shared policy
+engine. This keeps extraction and rendering behavior consistent across sites.
+
+Search badging remains a separate Vrbo feature. Do not add cross-site
+background requests as part of listing-page parity. If future support requires
+new network activity, update `PRIVACY.md` and add request controls first.
 
 ### Vrbo search badging
 
