@@ -473,9 +473,10 @@
   }
 
   // Real source strings can be a combined "Section > Header" (see
-  // formatSourceLabel in extract.js) — for the compact per-row jump link
-  // we only want the lowest-level, linkable label (the header the
-  // snippet actually lives under), not the full hierarchy.
+  // formatSourceLabel in extract.js). Most jump links use the lowest-level
+  // label, but a listing-title header is not useful UI: for an
+  // "About this property > [listing title]" source, keep the section name
+  // so the button describes where it will take the user.
   //
   // Several sources never get a distinct header at all: the DOM
   // text-scan fallback (findSectionHeadingForElement) only ever returns
@@ -512,6 +513,8 @@
   function shortSourceLabel(source) {
     if (!source) return "";
     const parts = source.split(">").map((p) => p.trim()).filter(Boolean);
+    const section = parts[0] || "";
+    if (/^about this (?:property|space|listing)$/i.test(section)) return section;
     const last = parts.length ? parts[parts.length - 1] : source.trim();
     return shortSectionLabelLookup()[last.toLowerCase()] || last;
   }
