@@ -1,11 +1,11 @@
 # PawCheck: Dog Policy Callout
 
-PawCheck is a Chrome extension that finds dog-policy details on Vrbo, Airbnb,
-and Expedia listings and presents them in a compact summary.
+PawCheck finds the dog-policy details buried in Vrbo, Airbnb, and Expedia
+listings and puts them in a compact summary beside the property.
 
-![PawCheck showing a dog-policy summary beside a property listing](docs/listing-context.png)
+![PawCheck — dog policy details, right where you need them](store-assets/marquee-promo-tile-1400x560.png)
 
-## Why?
+## Why
 
 Booking sites do not present pet policies in a consistent place. Hosts may
 put restrictions in house rules, amenities, property descriptions, policy
@@ -16,7 +16,7 @@ A property marked as pet-friendly may still limit dog count, weight, breed,
 or require fees and prior approval. PawCheck gathers those details so you do
 not have to search every section manually.
 
-## What
+## What PawCheck shows
 
 When you open a supported listing, PawCheck reads the available pet-policy
 data and displays an on-page summary containing:
@@ -27,15 +27,19 @@ data and displays an on-page summary containing:
 - Registration or prior-approval requirements
 - Other guidelines, including leash or breed restrictions
 
-![PawCheck dog-policy summary](docs/listing-summary.png)
-
 Source links jump to the corresponding listing text when possible. PawCheck
 also warns when sections contain contradictory rules, supports light and dark
 themes, and can add optional dog-policy badges to Vrbo search results.
 
+Listings contain different amounts of usable policy information. PawCheck
+adapts its summary from a short confirmation to a detailed breakdown without
+filling unknown fields with noise.
+
+![Sparse, medium, and dense PawCheck policy summaries in light mode](store-assets/screenshot-light-density-comparison-1280x800.png)
+
 ## Listing examples
 
-### Vrbo
+### Vrbo listing
 
 ![PawCheck on a Vrbo listing](docs/listing-gifs/vrbo-9793597ha.gif)
 
@@ -45,23 +49,20 @@ themes, and can add optional dog-policy badges to Vrbo search results.
 
 ### Airbnb
 
-![PawCheck on an Airbnb listing](docs/listing-screenshots/airbnb-1022499796703563395.png)
+![PawCheck in light mode on an Airbnb listing](store-assets/screenshot-4-airbnb-light-1280x800.png)
 
 ### Expedia
 
-![PawCheck on an Expedia listing](docs/listing-screenshots/expedia-candlewood-panama-city-beach.png)
+![PawCheck in light mode on an Expedia listing](store-assets/screenshot-5-expedia-light-1280x800.png)
 
 ## Install a release
 
-1. Download `pawcheck-v1.0.1.zip` from
-   [GitHub Releases](https://github.com/curdriceaurora/pawcheck/releases).
+1. Download the latest `pawcheck-v*.zip` from
+   [GitHub Releases](https://github.com/curdriceaurora/pawcheck/releases/latest).
 2. Unzip the archive.
 3. Open `chrome://extensions` in Chrome.
 4. Enable **Developer mode**.
 5. Select **Load unpacked** and choose the unzipped folder.
-
-When loading a source checkout instead, choose its `src/` directory. The
-repository root does not contain the extension manifest.
 
 ## Supported pages
 
