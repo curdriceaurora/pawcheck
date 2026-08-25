@@ -47,10 +47,17 @@ filling unknown fields with noise.
 
 ![PawCheck badges on Vrbo search results](docs/listing-gifs/vrbo-search-navarre.gif)
 
-Search badges are off by default. To enable them, open PawCheck from the
-Chrome toolbar and turn on **Enable search listings badges**. While enabled,
-PawCheck fetches public property pages directly from Vrbo as search results
-load so it can summarize each listing's dog policy.
+Search badges are experimental and off by default because enabling them can
+generate many more property-page requests than ordinary browsing. PawCheck
+limits concurrency, caps each session, caches results, and backs off after
+errors or challenges, but there is still a real chance Vrbo may throttle or
+challenge your browser. Use the feature sparingly and turn it off when you
+are finished.
+
+To enable search badges, open PawCheck from the Chrome toolbar and turn on
+**Enable search listings badges**. While enabled, PawCheck fetches public
+property pages directly from Vrbo as search results load so it can summarize
+each listing's dog policy.
 
 ### Airbnb
 
