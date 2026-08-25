@@ -39,13 +39,17 @@ themes, and can add optional dog-policy badges to Vrbo search results.
 
 ![PawCheck on a Vrbo listing](docs/listing-gifs/vrbo-9793597ha.gif)
 
+### Vrbo search results
+
+![PawCheck badges on Vrbo search results](docs/listing-gifs/vrbo-search-navarre.gif)
+
 ### Airbnb
 
-![PawCheck on an Airbnb listing](docs/listing-gifs/airbnb-1022499796703563395.gif)
+![PawCheck on an Airbnb listing](docs/listing-screenshots/airbnb-1022499796703563395.png)
 
 ### Expedia
 
-![PawCheck on an Expedia listing](docs/listing-gifs/expedia-candlewood-panama-city-beach.gif)
+![PawCheck on an Expedia listing](docs/listing-screenshots/expedia-candlewood-panama-city-beach.png)
 
 ## Install a release
 
