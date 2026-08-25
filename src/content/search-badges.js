@@ -392,7 +392,7 @@
       searchTooltipEl.id = "paw-search-tooltip";
       searchTooltipEl.className = "paw-search-tooltip";
       searchTooltipEl.setAttribute("role", "dialog");
-      searchTooltipEl.setAttribute("aria-label", "Dog policy");
+      searchTooltipEl.setAttribute("aria-label", "PawCheck");
       searchTooltipEl.setAttribute("aria-hidden", "true");
       searchTooltipEl.style.display = "none";
 
@@ -910,7 +910,7 @@
     const header = document.createElement("div");
     header.className = "paw-tooltip-header";
     const titleSpan = document.createElement("span");
-    titleSpan.textContent = "Dog policy";
+    titleSpan.textContent = "PawCheck";
     const closeBtn = document.createElement("button");
     closeBtn.className = "paw-tooltip-close";
     closeBtn.setAttribute("aria-label", "Close details");

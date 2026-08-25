@@ -622,12 +622,12 @@
       }
     }
 
-    // Title stays a static "Dog policy" across every state — matching the
+    // Title stays a static "PawCheck" across every state — matching the
     // search tooltip's header, which never changes text either — so the
     // panel and tooltip read as the same widget. Status is conveyed by
     // headlineTone (the header's background color) and the row/body
     // content below, not by swapping the title itself.
-    headline = "Dog policy";
+    headline = "PawCheck";
     if (policy.petsAllowed === false) {
       headlineTone = "bad";
       rowsHtml = row("Policy", "No pets allowed", "bad", raw.petsAllowedSnippet, raw.petsAllowedSource);
@@ -768,7 +768,7 @@
     }
 
     return `
-      <div class="paw-header paw-tone-${headlineTone}" tabindex="0" role="button" aria-expanded="true" aria-label="Toggle dog policy details">
+      <div class="paw-header paw-tone-${headlineTone}" tabindex="0" role="button" aria-expanded="true" aria-label="Toggle PawCheck details">
         <span class="paw-title">${headline}</span>
         <div class="paw-header-btns">
           <button type="button" class="paw-rescan" title="Rescan page">↻</button>
