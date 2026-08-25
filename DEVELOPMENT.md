@@ -1,8 +1,8 @@
 # Development
 
-This repository contains the PawCheck Chrome extension runtime and the files
-needed to package a release. It does not include the original test suites,
-browser automation, demo generators, or other internal tooling.
+This repository contains the PawCheck Chrome extension runtime and the release
+packaging files. It does not contain the original test suites, browser
+automation, demo generators, or other internal tools.
 
 ## Requirements
 
@@ -10,8 +10,8 @@ browser automation, demo generators, or other internal tooling.
 - Node.js 20 or later
 - The `zip` command-line utility
 
-PawCheck has no runtime or development package dependencies. You do not need
-to run `npm install` to build the extension.
+PawCheck has no runtime or development package dependencies. You can build
+the extension without `npm install`.
 
 ## Repository layout
 
@@ -27,42 +27,42 @@ to run `npm install` to build the extension.
 ## Runtime architecture
 
 PawCheck is a dependency-free Manifest V3 extension. The manifest loads the
-shared registry and extraction modules before the page controllers. Airbnb
-and Expedia then register their adapters with the shared registry; Vrbo is
-the registry's built-in site. `content/content.js` connects the lifecycle,
-listing-panel, and search-badge modules without putting site-specific parsing
-logic in the controller.
+shared registry and extraction modules before it loads the page controllers.
+Airbnb and Expedia register their adapters with the shared registry. The
+registry contains the built-in Vrbo site. `content/content.js` connects the
+lifecycle, listing-panel, and search-badge modules. The controller contains no
+site-specific parsing logic.
 
 The main runtime responsibilities are:
 
 - `content/lifecycle.js` — tracks SPA navigation, DOM mutations, extension
-  invalidation, and safe access to `chrome.storage.local`
+  invalidation, and access to `chrome.storage.local`
 - `shared/site-registry.js` — classifies URLs, extracts property IDs, and
   exposes each site's structured-data and DOM-section configuration
 - `content/pdp-panel.js` — scans listing pages, combines sources, renders the
   policy panel, and implements source jumps
 - `shared/extract.js` — builds the prioritized policy corpus, extracts policy
-  fields, resolves contradictions, and normalizes the result
+  fields, identifies contradictions, and normalizes the result
 - `content/search-badges.js` — discovers Vrbo search cards and manages badges,
   viewport gating, tooltips, and queue subscriptions
 - `shared/search-fetcher.js`, `shared/search-cache.js`, and
-  `shared/backoff-ladder.js` — own search-result requests, caching, pacing,
-  request budgets, and pressure recovery
+  `shared/backoff-ladder.js` — control search-result requests, caching,
+  request intervals, request limits, and recovery after server pressure
 
 ### Listing-page pipeline
 
-All three supported sites produce the same normalized policy shape, but they
-do not expose listing data the same way.
+The three supported sites use the same normalized policy format. Each site
+supplies listing data differently.
 
 | Site | Structured source | Adapter behavior |
 | --- | --- | --- |
-| Vrbo | `window.__APOLLO_STATE__` | `content/page-bridge.js` runs in the page's MAIN world, walks the current `PropertyInfo` graph, and sends text items to the isolated content script through `paw-apollo-data` events. |
-| Airbnb | `#data-deferred-state-0` | `sites/airbnb/adapter.js` parses the Relay/GraphQL `niobeClientData` JSON directly from the DOM and keeps long numeric listing IDs as strings. |
+| Vrbo | `window.__APOLLO_STATE__` | `content/page-bridge.js` runs in the page's MAIN world. It reads the current `PropertyInfo` graph and sends text to the isolated content script through `paw-apollo-data` events. |
+| Airbnb | `#data-deferred-state-0` | `sites/airbnb/adapter.js` parses the Relay/GraphQL `niobeClientData` JSON from the DOM. It keeps long numeric listing IDs as strings. |
 | Expedia | Microdata and JSON-LD | `sites/expedia/adapter.js` reads `meta[itemprop="petsAllowed"]` and matching `FAQPage` answers. |
 
-Every site also uses a visible-DOM fallback. The fallback labels snippets with
-the nearest recognized section so source buttons can take the user back to
-the relevant listing text.
+Each site also uses a visible-DOM fallback. This fallback labels each text item
+with the nearest identified section. Source buttons use this label to open the
+applicable listing text.
 
 ```mermaid
 flowchart LR
@@ -83,32 +83,37 @@ flowchart LR
     K --> M[Source links jump to listing text]
 ```
 
-`pdp-panel.js` performs a second, best-effort DOM pass when the first pass
-finds no policy data or the user requests a rescan. That pass expands relevant
-"show more" controls, harvests text from dialogs it opened, briefly mounts
-likely lazy sections, and restores the page afterward. Mutations caused by
-this work are suppressed so PawCheck does not trigger its own rescan loop.
+If the first scan finds no policy data, `pdp-panel.js` starts a second DOM
+scan. It also starts this scan when the user requests a rescan. This scan opens
+applicable **Show more** controls and collects text from the dialogs. PawCheck
+temporarily mounts possible lazy sections. Then, it restores the page.
+PawCheck ignores the DOM mutations from this work. This prevents an unwanted
+rescan loop.
 
-`buildCorpus()` splits source text into policy-sized sentences, filters mixed
-sections for dog/pet relevance, and de-duplicates identical text while keeping
-the highest-priority source. Dedicated Pets rows rank above House Rules,
-property descriptions, and visible-page fallback text. `extractPolicy()` then
-derives allowance, dog count, weight, fees, deposits, approval requirements,
-and other notes. Conflicting values remain attached as alternates instead of
-being silently discarded.
+`buildCorpus()` divides source text into policy sentences. It removes text
+that is not applicable to dogs or pets. It removes duplicate text and keeps
+the source with the highest priority. Pets rows have a higher priority than
+House Rules, property descriptions, and visible-page fallback text.
+`extractPolicy()` then finds permission, dog count, weight, fees, deposits,
+approval requirements, and other notes. It keeps conflicting values as
+alternatives.
 
-Before rendering, the policy is normalized into the same schema used by
-search badges and the toolbar popup. A scan records the page URL before any
-asynchronous expansion; if an SPA navigation changes the URL while the scan
-is running, the result is discarded rather than shown on the next property.
+Before PawCheck shows the result, it normalizes the policy. Search badges and
+the toolbar popup use the same policy format. Before asynchronous expansion,
+the scan records the page URL. If SPA navigation changes the URL during the
+scan, PawCheck discards the result. It does not show the result on the next
+property.
 
 ### Vrbo search badging
 
-Search badging is an experimental, Vrbo-only feature. It starts only when the
-current URL is a registered Vrbo search route and
-`paw_enable_search_badging` is `true` in local extension storage. Airbnb and
-Expedia adapters return `false` from `isSearchUrl()`, so the search pipeline
-cannot activate on those sites.
+Search badging is experimental and operates only on Vrbo. It starts only when
+these conditions are true:
+
+- The current URL is a registered Vrbo search route.
+- `paw_enable_search_badging` is `true` in local extension storage.
+
+The Airbnb and Expedia adapters return `false` from `isSearchUrl()`. Thus, the
+search pipeline does not start on these sites.
 
 ```mermaid
 flowchart TD
@@ -125,49 +130,50 @@ flowchart TD
     H --> I[Fetch and parse public Vrbo listing]
     I --> K[Persist normalized result and aliases]
     K --> J
-    J --> L[Hover or keyboard focus may request high priority]
+    J --> L[Hover or keyboard focus can request high priority]
 ```
 
-Cards are tracked by property ID because Vrbo recycles DOM nodes during SPA
-updates. A recycled or detached card has its subscription, dwell timer, and
-queued work removed. Duplicate cards for the same property share the cached
-result and queue subscription.
+PawCheck tracks cards by property ID. Vrbo reuses DOM nodes during SPA
+updates. When Vrbo reuses or removes a card, PawCheck removes its subscription,
+dwell timer, and queued work. Duplicate cards for one property use the same
+cached result and queue subscription.
 
-The search-page Apollo fast path asks `page-bridge.js` for at most 40
-`PropertyInfo` records that Vrbo has already loaded. A concrete answer can
-render without a property-page request. A shallow answer can render
-immediately but still allows a later listing fetch to replace it with richer
-data.
+The search-page Apollo fast path asks `page-bridge.js` for a maximum of 40
+`PropertyInfo` records. Vrbo already loaded these records. PawCheck can show a
+definitive policy without a property-page request. PawCheck can immediately
+show a preliminary policy. A later listing request can replace this policy
+with more information.
 
 ### Search-traffic mitigations
 
-These controls reduce traffic and react to server pressure; they do not make
-the experimental feature risk-free. Vrbo can still throttle or challenge the
-browser, which is why badging remains off by default and should be used
-sparingly.
+These controls reduce traffic and respond to server pressure. They do not
+remove all risk from this experimental feature. Vrbo can throttle or challenge
+the browser. Therefore, badging is off by default. Use badging only when it is
+necessary.
 
 | Mitigation | Current behavior |
 | --- | --- |
-| Explicit opt-in | Search badging runs only when the toolbar setting is enabled. |
-| Search-page fast path | Reuses Vrbo Apollo records already present on the search page before considering a listing request. |
-| Visibility and dwell gate | A card must enter the observer margin and remain there for 400–600 ms before background work is queued. |
-| Off-screen pruning | Queued work is removed when a card leaves the viewport, is recycled, or disappears from the DOM. In-flight requests are allowed to finish. |
-| Scroll gate | Background dispatch pauses above 150 px/s and resumes after 150 ms of settled scrolling. Explicit hover/focus work remains responsive. |
-| Concurrency | At most two listing requests run at once. |
-| Session budget | Background traffic is capped at 40 dispatched requests per search-page session. Explicit high-priority user lookups may bypass the background cap. |
-| Dispatch pacing | Background requests start at an 800 ms floor; the shared high-priority floor is 250 ms. One-sided jitter only adds delay. |
-| Adaptive backoff | Pressure raises pacing through 800, 1600, and 3200 ms background steps. High-priority floors rise through 250, 500, and 1000 ms. |
-| Hard-block response | HTTP 429, HTTP 403, or a detected challenge pauses dispatch for 30 seconds and raises the backoff level. |
-| Soft-failure response | A cluster of three timeouts, network errors, or 5xx responses within 60 seconds raises the backoff level. Recovery requires a clean 60-second window. |
-| Timeout | A listing request is aborted after 6 seconds. |
-| Cache and de-duplication | A 24-hour persistent cache, a 250-entry in-memory LRU, canonical-ID aliases, and synchronous queue de-duplication avoid repeat requests. |
-| Terminal cooldown | Rate-limited, capped, timeout, and error states receive a short cooldown so repeated scans do not immediately retry them. |
-| Hidden-tab gate | The queue does not dispatch while the document is hidden. |
-| Local-only instrumentation | Search counters are held in memory for debugging and are never persisted or transmitted. |
+| Explicit opt-in | PawCheck starts search badging only when the user enables the toolbar setting. |
+| Search-page fast path | PawCheck uses Vrbo Apollo records from the search page before it makes a listing request. |
+| Visibility and dwell gate | A card must enter the observer margin and stay there for 400–600 ms. PawCheck then queues background work. |
+| Off-screen pruning | PawCheck removes queued work when a card leaves the viewport, disappears, or Vrbo reuses it. PawCheck lets active requests finish. |
+| Scroll gate | PawCheck pauses background requests above 150 px/s. It resumes them after scrolling stops for 150 ms. Hover or keyboard-focus requests can continue. |
+| Concurrency | PawCheck runs a maximum of two listing requests at one time. |
+| Session limit | PawCheck permits a maximum of 40 background requests in one search-page session. A high-priority user request can exceed this limit. |
+| Request intervals | The minimum background interval is 800 ms. The minimum high-priority interval is 250 ms. Random adjustment only increases the interval. |
+| Adaptive backoff | Server pressure increases background intervals through 800, 1600, and 3200 ms. It increases high-priority intervals through 250, 500, and 1000 ms. |
+| Hard-block response | If PawCheck receives HTTP 429 or HTTP 403, it pauses requests for 30 seconds. It does the same when it finds a challenge. It also increases the backoff level. |
+| Soft-failure response | Three timeouts, network errors, or 5xx responses in 60 seconds increase the backoff level. A 60-second period without errors starts recovery. |
+| Timeout | PawCheck cancels a listing request after 6 seconds. |
+| Cache and duplicate control | A 24-hour persistent cache and a 250-entry memory cache prevent repeat requests. Canonical-ID aliases and queue checks provide more duplicate control. |
+| Terminal cooldown | PawCheck applies a short wait after rate-limit, session-limit, timeout, and error states. The wait prevents an immediate retry. |
+| Hidden-tab gate | When the document is hidden, PawCheck does not start a queued request. |
+| Local-only instrumentation | PawCheck keeps search counters in memory for debugging. It does not store or transmit these counters. |
 
-Search-result requests go directly from the user's browser to Vrbo and use the
-browser's existing Vrbo session. PawCheck does not proxy these requests or
-send results, browsing activity, or diagnostics to the developer.
+The user's browser sends search-result requests directly to Vrbo. These
+requests use the existing Vrbo session. PawCheck does not send requests through
+an intermediate server. PawCheck does not send results, browsing activity, or
+diagnostic data to the developer.
 
 ## Load the extension locally
 
@@ -175,20 +181,21 @@ send results, browsing activity, or diagnostics to the developer.
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
 4. Choose this repository's `src/` directory.
-5. After changing runtime files, select **Reload** on the PawCheck extension
-   card and refresh the page being checked.
+5. If you change runtime files, select **Reload** on the PawCheck extension
+   card.
+6. Refresh the page that you want to test.
 
 ## Validate runtime JavaScript
 
-Run Node's syntax checker across the runtime before packaging:
+Before packaging, run the Node.js syntax check on the runtime:
 
 ```sh
 find src -name '*.js' -print0 | xargs -0 -n1 node --check
 ```
 
-Then verify the extension manually on supported listing pages. Confirm that
-the listing summary, source links, popup, theme, and optional Vrbo search
-badges behave as expected.
+Then, test the extension on supported listing pages. Make sure that the
+listing summary, source links, popup, theme, and optional Vrbo search badges
+operate correctly.
 
 ## Build a release
 
@@ -197,11 +204,11 @@ npm run build
 unzip -t dist/pawcheck-v1.0.1.zip
 ```
 
-The builder reads the product name and version from `src/manifest.json` and
-creates `dist/pawcheck-vX.Y.Z.zip`. The archive root contains the contents of
-`src/`, which is the layout Chrome expects.
+The builder reads the product name and version from `src/manifest.json`. It
+creates `dist/pawcheck-vX.Y.Z.zip`. The archive root contains the files from
+`src/`. Chrome requires this layout.
 
-The `dist/` directory and ZIP archives are intentionally ignored by Git.
+Git ignores the `dist/` directory and ZIP archives.
 
 ## Prepare a new version
 
@@ -209,13 +216,17 @@ The `dist/` directory and ZIP archives are intentionally ignored by Git.
 2. Update `version` in `package.json` to match.
 3. Add the release entry to `CHANGELOG.md`.
 4. Update any version-specific filenames in the documentation.
-5. Run the syntax check and manually verify the unpacked extension.
-6. Build the archive and run `unzip -t` against it.
-7. Commit the release, create the matching `vX.Y.Z` Git tag, and attach the
-   ZIP archive to the GitHub release.
+5. Run the syntax check.
+6. Test the unpacked extension.
+7. Build the archive.
+8. Run `unzip -t` on the archive.
+9. Commit the release.
+10. Create the matching `vX.Y.Z` Git tag.
+11. Attach the ZIP archive to the GitHub release.
 
 ## Privacy-sensitive changes
 
-Keep `PRIVACY.md` aligned with any changes to permissions, host access,
-storage, or network behavior. PawCheck must not add telemetry or transmit
-user browsing data without a clear product decision and an updated policy.
+If permissions, host access, storage, or network behavior change, update
+`PRIVACY.md`. Do not add telemetry or transmit user browsing data without an
+approved product decision. Update the privacy policy before you release such
+a change.

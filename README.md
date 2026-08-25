@@ -1,25 +1,23 @@
 # PawCheck: Dog Policy Callout
 
-PawCheck finds the dog-policy details buried in Vrbo, Airbnb, and Expedia
-listings and puts them in a compact summary beside the property.
+PawCheck finds dog-policy information in Vrbo, Airbnb, and Expedia listings.
+It shows this information in a compact summary beside the property.
 
 ![PawCheck — dog policy details, right where you need them](store-assets/marquee-promo-tile-1400x560.png)
 
 ## Why
 
-Booking sites do not present pet policies in a consistent place. Hosts may
+Booking sites do not show pet policies in a consistent location. Hosts can
 put restrictions in house rules, amenities, property descriptions, policy
-sections, or structured page data. Rules can also conflict within the same
-listing.
+sections, or structured page data. One listing can contain conflicting rules.
 
-A property marked as pet-friendly may still limit dog count, weight, breed,
-or require fees and prior approval. PawCheck gathers those details so you do
-not have to search every section manually.
+A pet-friendly property can still limit dog count, weight, or breed. It can
+also require fees or prior approval. PawCheck collects these details for you.
 
 ## What PawCheck shows
 
 When you open a supported listing, PawCheck reads the available pet-policy
-data and displays an on-page summary containing:
+data. It shows a summary that contains:
 
 - Whether dogs are allowed
 - Maximum dog count and weight limits
@@ -27,13 +25,12 @@ data and displays an on-page summary containing:
 - Registration or prior-approval requirements
 - Other guidelines, including leash or breed restrictions
 
-Source links jump to the corresponding listing text when possible. PawCheck
-also warns when sections contain contradictory rules, supports light and dark
-themes, and can add optional dog-policy badges to Vrbo search results.
+When possible, source links open the applicable listing text. PawCheck
+identifies conflicting rules. It supports light and dark themes. It can also
+add optional dog-policy badges to Vrbo search results.
 
-Listings contain different amounts of usable policy information. PawCheck
-adapts its summary from a short confirmation to a detailed breakdown without
-filling unknown fields with noise.
+The quantity of available policy information is different for each listing.
+PawCheck shows only the available information.
 
 ![Sparse, medium, and dense PawCheck policy summaries in light mode](store-assets/screenshot-light-density-comparison-1280x800.png)
 
@@ -47,17 +44,20 @@ filling unknown fields with noise.
 
 ![PawCheck badges on Vrbo search results](docs/listing-gifs/vrbo-search-navarre.gif)
 
-Search badges are experimental and off by default because enabling them can
-generate many more property-page requests than ordinary browsing. PawCheck
-limits concurrency, caps each session, caches results, and backs off after
-errors or challenges, but there is still a real chance Vrbo may throttle or
-challenge your browser. Use the feature sparingly and turn it off when you
-are finished.
+Search badges are experimental. The setting is off by default. Search badging
+makes more property-page requests than standard browsing. PawCheck limits
+concurrent requests, sets a session limit, caches results, and increases the
+delay after errors or challenges. These controls reduce traffic, but they do
+not remove the risk. Vrbo can throttle or challenge your browser. Enable this
+feature only when necessary. Disable it when you finish.
 
-To enable search badges, open PawCheck from the Chrome toolbar and turn on
-**Enable search listings badges**. While enabled, PawCheck fetches public
-property pages directly from Vrbo as search results load so it can summarize
-each listing's dog policy.
+To enable search badges:
+
+1. Open PawCheck from the Chrome toolbar.
+2. Turn on **Enable search listings badges**.
+
+When this setting is on, PawCheck requests public property pages directly
+from Vrbo. PawCheck uses these pages to summarize each listing's dog policy.
 
 ### Airbnb
 
@@ -74,16 +74,17 @@ each listing's dog policy.
 2. Unzip the archive.
 3. Open `chrome://extensions` in Chrome.
 4. Enable **Developer mode**.
-5. Select **Load unpacked** and choose the unzipped folder.
+5. Select **Load unpacked**.
+6. Choose the unzipped folder.
 
 ## Supported pages
 
 PawCheck supports property listing pages on Vrbo, Airbnb, and Expedia. Search
-result badging is currently available on Vrbo only.
+badges are available only on Vrbo.
 
-PawCheck is independent software and is not affiliated with or endorsed by
-Vrbo, Airbnb, Expedia, or their parent companies. Always verify the original
-property rules before booking.
+PawCheck is independent software. PawCheck has no affiliation with Vrbo,
+Airbnb, Expedia, or their parent companies. These companies do not endorse
+PawCheck. Always verify the original property rules before you book.
 
 - [Release notes](CHANGELOG.md)
 - [Development guide](DEVELOPMENT.md)
