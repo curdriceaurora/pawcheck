@@ -53,7 +53,7 @@ themes, and can add optional dog-policy badges to Vrbo search results.
 
 ## Install a release
 
-1. Download `pawcheck-v1.0.0.zip` from
+1. Download `pawcheck-v1.0.1.zip` from
    [GitHub Releases](https://github.com/curdriceaurora/pawcheck/releases).
 2. Unzip the archive.
 3. Open `chrome://extensions` in Chrome.

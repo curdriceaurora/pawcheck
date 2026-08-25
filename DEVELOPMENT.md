@@ -49,7 +49,7 @@ badges behave as expected.
 
 ```sh
 npm run build
-unzip -t dist/pawcheck-v1.0.0.zip
+unzip -t dist/pawcheck-v1.0.1.zip
 ```
 
 The builder reads the product name and version from `src/manifest.json` and
