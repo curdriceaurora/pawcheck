@@ -151,6 +151,11 @@ remove all risk from this experimental feature. Vrbo can throttle or challenge
 the browser. Therefore, badging is off by default. Use badging only when it is
 necessary.
 
+The table gives the current runtime values. If a value changes, update this
+table. Check the constants in `content/search-badges.js`,
+`shared/search-fetcher.js`, `shared/search-cache.js`, and
+`shared/backoff-ladder.js`.
+
 | Mitigation | Current behavior |
 | --- | --- |
 | Explicit opt-in | PawCheck starts search badging only when the user enables the toolbar setting. |
@@ -163,7 +168,7 @@ necessary.
 | Request intervals | The minimum background interval is 800 ms. The minimum high-priority interval is 250 ms. Random adjustment only increases the interval. |
 | Adaptive backoff | Server pressure increases background intervals through 800, 1600, and 3200 ms. It increases high-priority intervals through 250, 500, and 1000 ms. |
 | Hard-block response | If PawCheck receives HTTP 429 or HTTP 403, it pauses requests for 30 seconds. It does the same when it finds a challenge. It also increases the backoff level. |
-| Soft-failure response | Three timeouts, network errors, or 5xx responses in 60 seconds increase the backoff level. A 60-second period without errors starts recovery. |
+| Soft-failure response | Three timeouts, network errors, or 5xx responses in 60 seconds increase the backoff level. After a 60-second clean period, the next request that returns a concrete policy decreases the level by one. Each additional decrease requires another clean period and concrete-policy result. |
 | Timeout | PawCheck cancels a listing request after 6 seconds. |
 | Cache and duplicate control | A 24-hour persistent cache and a 250-entry memory cache prevent repeat requests. Canonical-ID aliases and queue checks provide more duplicate control. |
 | Terminal cooldown | PawCheck applies a short wait after rate-limit, session-limit, timeout, and error states. The wait prevents an immediate retry. |
@@ -181,9 +186,11 @@ diagnostic data to the developer.
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
 4. Choose this repository's `src/` directory.
-5. If you change runtime files, select **Reload** on the PawCheck extension
-   card.
-6. Refresh the page that you want to test.
+
+After you change a runtime file:
+
+1. Select **Reload** on the PawCheck extension card.
+2. Refresh the page that you want to test.
 
 ## Validate runtime JavaScript
 
@@ -215,14 +222,16 @@ Git ignores the `dist/` directory and ZIP archives.
 1. Update `version` in `src/manifest.json`.
 2. Update `version` in `package.json` to match.
 3. Add the release entry to `CHANGELOG.md`.
-4. Update any version-specific filenames in the documentation.
-5. Run the syntax check.
-6. Test the unpacked extension.
-7. Build the archive.
-8. Run `unzip -t` on the archive.
-9. Commit the release.
-10. Create the matching `vX.Y.Z` Git tag.
-11. Attach the ZIP archive to the GitHub release.
+4. Update the example archive name in **Build a release**.
+5. Search the documentation for the old version number.
+6. Update each release-specific reference that you find.
+7. Run the syntax check.
+8. Test the unpacked extension.
+9. Build the archive.
+10. Run `unzip -t` on the archive.
+11. Commit the release.
+12. Create the matching `vX.Y.Z` Git tag.
+13. Attach the ZIP archive to the GitHub release.
 
 ## Privacy-sensitive changes
 
