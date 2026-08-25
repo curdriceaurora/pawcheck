@@ -47,6 +47,11 @@ filling unknown fields with noise.
 
 ![PawCheck badges on Vrbo search results](docs/listing-gifs/vrbo-search-navarre.gif)
 
+Search badges are off by default. To enable them, open PawCheck from the
+Chrome toolbar and turn on **Enable search listings badges**. While enabled,
+PawCheck fetches public property pages directly from Vrbo as search results
+load so it can summarize each listing's dog policy.
+
 ### Airbnb
 
 ![PawCheck in light mode on an Airbnb listing](store-assets/screenshot-4-airbnb-light-1280x800.png)
@@ -67,7 +72,7 @@ filling unknown fields with noise.
 ## Supported pages
 
 PawCheck supports property listing pages on Vrbo, Airbnb, and Expedia. Search
-result badges are available on Vrbo and are disabled by default.
+result badging is currently available on Vrbo only.
 
 PawCheck is independent software and is not affiliated with or endorsed by
 Vrbo, Airbnb, Expedia, or their parent companies. Always verify the original
